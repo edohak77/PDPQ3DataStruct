@@ -1,0 +1,4 @@
+Cannot generate into /home/eduard_h/PDP_Q3_2020/cmake-build-debug
+It is already used for project /home/eduard_h/CLionProjects/PDP_Q3_2020
+
+Please either delete it manually or select another generation directory
