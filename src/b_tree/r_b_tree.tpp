@@ -21,9 +21,8 @@ void RBTree::Add(int element) {
         root_ = new RBTNode(element);
         root_->color_ = BLACK;
     } else {
-        RBTNode *new_nod = new RBTNode(element);
         RBTNode *current = SetToPosition(element);
-        CheckForAddToRBTRulles(current);
+        CheckForAddToRBTRules(current);
     }
 
     size_++;
@@ -69,180 +68,127 @@ RBTNode *RBTree::SetToPosition(int element) {
     return current;
 }
 
-void RBTree::CheckForAddToRBTRulles(RBTNode *current) {
-
-    RBTNode *parent = current->parent_;
-    RBTNode *g_parent = current->parent_->parent_;
-    RBTNode *uncle = nullptr;
-    CildSides my_side = IS_RIGHT;
-
-    if (parent->l_child_ != nullptr && current == parent->l_child_) {
-        my_side = IS_LEFT;
-    }
-
-    if (GetParentSide(current) == IS_LEFT) {
-        if (g_parent->r_child_ != nullptr) {
-            uncle = g_parent->r_child_;
-        }
-    } else if (GetParentSide(current) == IS_RIGHT) {
-        if (g_parent->l_child_ != nullptr) {
-            uncle = g_parent->l_child_;
-        }
+void RBTree::Rule_1(RBTNode *current){
+    if (current -> parent_ == nullptr){
+        current->color_ = BLACK;
     } else {
-        uncle = nullptr;
+        Rule_2(current);
     }
+}
 
-    if (parent->color_ == BLACK) {
+void RBTree::Rule_2(RBTNode *current){
+    if (current->parent_->color_ == BLACK){
         return;
-    }
-
-//    case3 for Add functionality-> if parent's color is red and uncle's color is red
-    if (g_parent != nullptr) {
-
-        if (parent->color_ == RED && uncle != nullptr && uncle->color_ == RED) {
-            parent->color_ = BLACK;
-            uncle->color_ = BLACK;
-            g_parent->color_ = RED;
-
-            if (isRoot(g_parent)) {
-                g_parent->color_ = BLACK;
-            } else {
-                CheckForAddToRBTRulles(g_parent);
-            }
-
-//    case 4 for Add functionality-> if parent's color is red and uncle's color is black
-        } else if (parent->color_ == RED) {
-            if (uncle == nullptr || uncle->color_ == BLACK) {
-                // case 4.1 when current node is right child and his parent is left child
-                if (my_side == IS_RIGHT && GetParentSide(current) == IS_LEFT) {
-                    RotateToLeft(current);
-                    CheckForAddToRBTRulles(current->l_child_);
-                    // case 4.1 when current node is left child and his parent is left child
-                } else if (my_side == IS_LEFT && GetParentSide(current) == IS_LEFT) {
-                    RotateToRight(current);
-                }
-            }
-        }
+    } else {
+        Rule_3(current);
     }
 }
 
-std::vector<RBTNode *> RBTree::GetToAddCheckData(RBTNode *current) {
-    std::vector<RBTNode *> data;
-//    RBTNodeToAddCheckingData data;
+void RBTree::Rule_3(RBTNode *current) {
+    RBTNode *uncle = GetUncle(current);
 
-    data.push_back(GetParent(current));
-    data.push_back(GetUncle(current));
-    data.push_back(GetGrandP(current));
-
-    return data;
+    if ((uncle != nullptr) && (uncle->color_ == RED)) {
+        current->parent_->color_ = BLACK;
+        uncle->color_ = BLACK;
+        RBTNode *gParent = GetGrandP(current);
+        gParent->color_ = RED;
+        Rule_1(gParent);
+    } else {
+        Rule_4(current);
+    }
 }
 
-RBTNode *RBTree::GetParent(RBTNode *pNode) {
-    if (isRoot(pNode)) {
-        return nullptr;
+
+
+void RBTree::Rule_4(RBTNode *current) {
+    RBTNode *gParent = GetGrandP(current);
+
+    if ((current == current->parent_->r_child_) && (current->parent_ == gParent->l_child_)) {
+        RotateToLeft(current->parent_);
+        current = current->l_child_;
+    } else if ((current == current->parent_->l_child_) && (current->parent_ == gParent->r_child_)) {
+        RotateToRight(current->parent_);
+        current = current->r_child_;
     }
-    return pNode->parent_;
+    Rule_5(current);
+}
+
+void RBTree::Rule_5(RBTNode *current) {
+    RBTNode *gParent = GetGrandP(current);
+
+    current->parent_->color_ = BLACK;
+    gParent->color_ = RED;
+    if ((current == current->parent_->l_child_) && (current->parent_ == gParent->l_child_)) {
+        RotateToRight(gParent);
+    } else {
+        RotateToLeft(gParent);
+    }
+}
+
+void RBTree::CheckForAddToRBTRules(RBTNode *current) {
+    Rule_1(current);
 }
 
 RBTNode *RBTree::GetUncle(RBTNode *pNode) {
-    if (isRoot(pNode)) {
+    RBTNode  *gParent = GetGrandP(pNode);
+    if (gParent == nullptr){
         return nullptr;
     }
 
-    if (pNode == pNode->parent_->l_child_) {
-        if (pNode->parent_->r_child_ == nullptr) {
-            return nullptr;
-        }
-        return pNode->parent_->r_child_;
-    } else {
-        if (pNode->parent_->l_child_ == nullptr) {
-            return nullptr;
-        }
-        return pNode->parent_->l_child_;
+    if (pNode->parent_ == gParent->l_child_){
+        return gParent->r_child_;
+    }else {
+        return gParent->l_child_;
     }
-
 }
 
 RBTNode *RBTree::GetGrandP(RBTNode *pNode) {
-    if (isRoot(pNode)) {
+    if ((pNode != nullptr) && (pNode->parent_ != nullptr)){
+        return pNode->parent_->parent_;
+    } else{
         return nullptr;
     }
-
-    if (pNode->parent_->parent_ == nullptr) {
-        return nullptr;
-    }
-
-    return pNode->parent_->parent_;
-}
-
-CildSides RBTree::GetParentSide(RBTNode *pNode) {
-
-    if (isRoot(pNode->parent_)) {
-        return IS_NIL;
-    }
-
-    if (pNode == pNode->parent_->l_child_) {
-        return IS_LEFT;
-    }
-
-    return IS_RIGHT;
 }
 
 void RBTree::RotateToLeft(RBTNode *current) {
-    RBTNode *parent = current->parent_;
-    RBTNode *g_parent = current->parent_->parent_;
-    RBTNode *uncle;
+    RBTNode *temp_root = current->r_child_;
 
-    if (GetParentSide(current) == IS_LEFT) {
-        if (g_parent->r_child_ != nullptr) {
-            uncle = g_parent->r_child_;
+    temp_root->parent_ = current->parent_;
+    if (current->parent_ != nullptr) {
+        if (current->parent_->l_child_ == current){
+            current->parent_->l_child_ = temp_root;
+        }else {
+            current->parent_->r_child_ = temp_root;
         }
-    } else if (GetParentSide(current) == IS_RIGHT) {
-        if (g_parent->l_child_ != nullptr) {
-            uncle = g_parent->l_child_;
-        }
-    } else {
-        uncle = nullptr;
     }
 
+    current->r_child_ = temp_root->l_child_;
+    if (temp_root->l_child_ != nullptr){
+        temp_root->l_child_->parent_ = current;
+    }
 
-    current->parent_ = g_parent;
-    g_parent->l_child_ = current;
-
-    RBTNode *new_node = parent;
-    current->l_child_ = new_node;
-    new_node->parent_ = current;
-
-    delete parent;
-
-    parent = new_node;
+    current->parent_ = temp_root;
+    temp_root->l_child_ = current;
 }
 
 void RBTree::RotateToRight(RBTNode *current) {
+    RBTNode *temp_root = current->l_child_;
 
-    RBTNode *parent = current->parent_;
-    RBTNode *g_parent = current->parent_->parent_;
-    RBTNode *uncle;
+    temp_root->parent_ = current->parent_;
 
-    if (GetParentSide(current) == IS_LEFT) {
-        if (g_parent->r_child_ != nullptr) {
-            uncle = g_parent->r_child_;
+    if(current->parent_ != nullptr){
+        if(current->parent_->l_child_ == current){
+            current->parent_->l_child_ = temp_root;
+        } else{
+            current->parent_->r_child_ = temp_root;
         }
-    } else if (GetParentSide(current) == IS_RIGHT) {
-        if (g_parent->l_child_ != nullptr) {
-            uncle = g_parent->l_child_;
-        }
-    } else {
-        uncle = nullptr;
-    }
+        current->l_child_ = temp_root->r_child_;
+        if (temp_root->r_child_ != nullptr)
+            temp_root->r_child_->parent_ = current;
 
-
-    RBTNode *temp_g_parent = g_parent;
-
-    g_parent->parent_ = parent;
-    parent->r_child_ = g_parent;
-
-    if (isRoot(parent)) {
-        parent->color_ = BLACK;
+        current->parent_ = temp_root;
+        temp_root->r_child_ = current;
     }
 }
+
+

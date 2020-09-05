@@ -4,16 +4,7 @@
 enum RBTNodeColor {
     RED,
     BLACK,
-    NIL
 };
-
-enum CildSides{
-    IS_LEFT,
-    IS_RIGHT,
-    IS_NIL
-};
-
-
 
 struct RBTNode {
     int data_;
@@ -24,14 +15,6 @@ struct RBTNode {
 
     RBTNode(int data);
     ~RBTNode();
-};
-
-struct RBTNodeToAddCheckingData{
-    RBTNode *parent_;
-    RBTNode *uncle_;
-    RBTNode *grand_p;
-
-    CildSides parentS_side_;
 };
 
 class RBTree {
@@ -48,20 +31,16 @@ private:
     int size_;
     bool isRoot(RBTNode *node);
     RBTNode *SetToPosition(int element);
-    void CheckForAddToRBTRulles(RBTNode *pNode);
-    std::vector<RBTNode*> GetToAddCheckData(RBTNode *pNode);
-
-    RBTNode *GetParent(RBTNode *pNode);
-
+    void CheckForAddToRBTRules(RBTNode *current);
     RBTNode *GetUncle(RBTNode *pNode);
-
     RBTNode *GetGrandP(RBTNode *pNode);
-
-    CildSides GetParentSide(RBTNode *pNode);
-
     void RotateToLeft(RBTNode *current);
-
     void RotateToRight(RBTNode *current);
+    void Rule_1(RBTNode *current);
+    void Rule_2(RBTNode *current);
+    void Rule_3(RBTNode *current);
+    void Rule_4(RBTNode *current);
+    void Rule_5(RBTNode *current);
 };
 
 
