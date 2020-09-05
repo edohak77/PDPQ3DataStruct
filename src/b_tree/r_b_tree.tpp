@@ -241,7 +241,6 @@ void RBTree::RotateToRight(RBTNode *current) {
 
     g_parent->parent_ = parent;
     parent->r_child_ = g_parent;
-    current
 
     if (isRoot(parent)) {
         parent->color_ = BLACK;

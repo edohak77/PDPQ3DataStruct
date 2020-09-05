@@ -17,7 +17,7 @@ set(tests
         ${PROJECT_SOURCE_DIR}/test/src/hash_table_test.cpp
         ${PROJECT_SOURCE_DIR}/test/src/hash_table_test_AO.cpp
         ${PROJECT_SOURCE_DIR}/test/src/r_b_tree_test.cpp
-    )
+        test/src/main.cpp)
 
 
 add_executable(PDP_Q3_2020 ${sources} ${tests})

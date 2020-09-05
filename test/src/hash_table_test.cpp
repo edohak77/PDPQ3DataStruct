@@ -3,8 +3,6 @@
 
 TEST_CASE("Hahs table with collision linked solution"){
 
-
-
     SECTION("GetHash"){
         HashTable_LC hash_table;
         int hash = hash_table.GetHash("Eduard");
