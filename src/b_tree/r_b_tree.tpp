@@ -29,11 +29,17 @@ void RBTree::Add(int element) {
 }
 
 void RBTree::Remove(int element) {
+    RBTNode *removable = Find(element);
+    if(removable == nullptr){
+        throw "Can't find element: " + std::to_string(element) + " for remove";
+    }
+
+    RemoveElementCheckedRules(removable);
 
 }
 
 bool RBTree::Contains(int element) {
-    return false;
+    return Find(element) != nullptr;
 }
 
 bool RBTree::isRoot(RBTNode *node) {
@@ -68,23 +74,23 @@ RBTNode *RBTree::SetToPosition(int element) {
     return current;
 }
 
-void RBTree::Rule_1(RBTNode *current){
+void RBTree::AddRule_1(RBTNode *current){
     if (current -> parent_ == nullptr){
         current->color_ = BLACK;
     } else {
-        Rule_2(current);
+        AddRule_2(current);
     }
 }
 
-void RBTree::Rule_2(RBTNode *current){
+void RBTree::AddRule_2(RBTNode *current){
     if (current->parent_->color_ == BLACK){
         return;
     } else {
-        Rule_3(current);
+        AddRule_3(current);
     }
 }
 
-void RBTree::Rule_3(RBTNode *current) {
+void RBTree::AddRule_3(RBTNode *current) {
     RBTNode *uncle = GetUncle(current);
 
     if ((uncle != nullptr) && (uncle->color_ == RED)) {
@@ -92,15 +98,13 @@ void RBTree::Rule_3(RBTNode *current) {
         uncle->color_ = BLACK;
         RBTNode *gParent = GetGrandP(current);
         gParent->color_ = RED;
-        Rule_1(gParent);
+        AddRule_1(gParent);
     } else {
-        Rule_4(current);
+        AddRule_4(current);
     }
 }
 
-
-
-void RBTree::Rule_4(RBTNode *current) {
+void RBTree::AddRule_4(RBTNode *current) {
     RBTNode *gParent = GetGrandP(current);
 
     if ((current == current->parent_->r_child_) && (current->parent_ == gParent->l_child_)) {
@@ -110,10 +114,10 @@ void RBTree::Rule_4(RBTNode *current) {
         RotateToRight(current->parent_);
         current = current->r_child_;
     }
-    Rule_5(current);
+    AddRule_5(current);
 }
 
-void RBTree::Rule_5(RBTNode *current) {
+void RBTree::AddRule_5(RBTNode *current) {
     RBTNode *gParent = GetGrandP(current);
 
     current->parent_->color_ = BLACK;
@@ -126,7 +130,7 @@ void RBTree::Rule_5(RBTNode *current) {
 }
 
 void RBTree::CheckForAddToRBTRules(RBTNode *current) {
-    Rule_1(current);
+    AddRule_1(current);
 }
 
 RBTNode *RBTree::GetUncle(RBTNode *pNode) {
@@ -191,4 +195,22 @@ void RBTree::RotateToRight(RBTNode *current) {
     }
 }
 
+RBTNode *RBTree::Find(int element) {
+    RBTNode *current = root_;
 
+    while (current != nullptr) {
+        if(current->data_ == element){
+            return current;
+        }
+        if (element >= current->data_) {
+            current = current->r_child_;
+        } else {
+            current = current->l_child_;
+        }
+    }
+
+    return nullptr;
+}
+void RBTree::RemoveElementCheckedRules(RBTNode *removable) {
+
+}

@@ -36,11 +36,13 @@ private:
     RBTNode *GetGrandP(RBTNode *pNode);
     void RotateToLeft(RBTNode *current);
     void RotateToRight(RBTNode *current);
-    void Rule_1(RBTNode *current);
-    void Rule_2(RBTNode *current);
-    void Rule_3(RBTNode *current);
-    void Rule_4(RBTNode *current);
-    void Rule_5(RBTNode *current);
+    void AddRule_1(RBTNode *current);
+    void AddRule_2(RBTNode *current);
+    void AddRule_3(RBTNode *current);
+    void AddRule_4(RBTNode *current);
+    void AddRule_5(RBTNode *current);
+    RBTNode *Find(int element);
+    void RemoveElementCheckedRules(RBTNode *removable);
 };
 
 
