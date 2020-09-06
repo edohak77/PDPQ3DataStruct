@@ -3,7 +3,7 @@
 #include <vector>
 enum RBTNodeColor {
     RED,
-    BLACK,
+    BLACK
 };
 
 struct RBTNode {
@@ -43,9 +43,17 @@ private:
     void AddRule_5(RBTNode *current);
     RBTNode *Find(int element);
     void RemoveElementCheckedRules(RBTNode *removable);
+    void RemoveRule_1(RBTNode *removable);
+    void RemoveRule_2(RBTNode *removeable);
+    void Replace(RBTNode *removable, RBTNode *child);
+    void DeleteChild(struct node *n);
+    void DeleteChild(RBTNode *removable);
+    RBTNode *GetBrother(RBTNode *current);
+    void RemoveRule_3(RBTNode *removable);
+    void RemoveRule_4(RBTNode *removable);
+    void RemoveRule_5(RBTNode *removable);
+    void RemoveRule_6(RBTNode *removable);
 };
-
-
 
 #include "../../src/b_tree/r_b_tree.tpp"
 #endif //PDP_Q3_2020_RBTREE_HPP

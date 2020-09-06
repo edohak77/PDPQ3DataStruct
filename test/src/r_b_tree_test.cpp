@@ -11,5 +11,17 @@ TEST_CASE("RED BLACK Tree:"){
         tree.Add(3);
         tree.Add(16);
         tree.Add(2);
+
+        CHECK(tree.Contains(2) == true);
+        CHECK(tree.Contains(16) == true);
+        CHECK(tree.Contains(15) == true);
+        CHECK(tree.Contains(5) == true);
+
+        tree.Remove(2);
+        tree.Remove(5);
+        CHECK(tree.Contains(2) == false);
+        CHECK(tree.Contains(16) == true);
+        CHECK(tree.Contains(15) == true);
+        CHECK(tree.Contains(5) == false);
     }
 }

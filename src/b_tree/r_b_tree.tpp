@@ -9,9 +9,15 @@ RBTNode::RBTNode(int data) {
 }
 
 RBTNode::~RBTNode() {
-    delete l_child_;
-    delete r_child_;
-    delete parent_;
+    if(l_child_ != nullptr){
+        delete l_child_;
+    }
+    if(l_child_ != nullptr){
+        delete r_child_;
+    }
+    if(l_child_ != nullptr){
+        delete parent_;
+    }
 }
 
 RBTree::RBTree() : root_(nullptr), size_(0) {}
@@ -33,8 +39,19 @@ void RBTree::Remove(int element) {
     if(removable == nullptr){
         throw "Can't find element: " + std::to_string(element) + " for remove";
     }
-
-    RemoveElementCheckedRules(removable);
+    if(removable->color_ == RED
+       && removable->l_child_ == nullptr
+       && removable->r_child_ == nullptr){
+        if(removable == removable->parent_->l_child_){
+            removable->parent_->l_child_ = nullptr;
+        }else{
+            removable->parent_->r_child_ = nullptr;
+        }
+        removable->parent_ = nullptr;
+        delete removable;
+    } else{
+        RemoveElementCheckedRules(removable);
+    }
 
 }
 
@@ -211,6 +228,125 @@ RBTNode *RBTree::Find(int element) {
 
     return nullptr;
 }
+
+RBTNode *RBTree::GetBrother(RBTNode *current){
+    if (current == current->parent_->l_child_){
+        return current->parent_->r_child_;
+    }else{
+        return current->parent_->l_child_;
+    }
+}
+
 void RBTree::RemoveElementCheckedRules(RBTNode *removable) {
 
+            RemoveRule_1(removable);
+}
+
+
+void RBTree::Replace(RBTNode *removable, RBTNode* child) {
+    child->parent_ = removable->parent_;
+    if (removable == removable->parent_->l_child_) {
+        removable->parent_->l_child_ = child;
+    } else {
+        removable->parent_->r_child_ = child;
+    }
+}
+
+void RBTree::DeleteChild(RBTNode *removable)
+{
+    RBTNode *child = removable->r_child_;
+
+    if(removable->r_child_ == nullptr){
+        child = removable->l_child_;
+    }
+
+    Replace(removable, child);
+    if (removable->color_ == BLACK) {
+        if (child->color_ == RED){
+            child->color_ = BLACK;
+        } else{
+            RemoveRule_1(child);
+        }
+    }
+    delete removable;
+}
+
+void RBTree::RemoveRule_1(RBTNode *removable) {
+    if (removable->parent_ != nullptr){
+        RemoveRule_2(removable);
+    }
+}
+void RBTree::RemoveRule_2(RBTNode *removable) {
+    RBTNode *brother = GetBrother(removable);
+
+    if (brother->color_ == RED) {
+        removable->parent_->color_ = RED;
+        brother->color_ = BLACK;
+        if (removable == removable->parent_->l_child_){
+            RotateToLeft(removable->parent_);
+        }else{
+            RotateToRight(removable->parent_);
+        }
+    }
+    RemoveRule_3(removable);
+}
+void RBTree::RemoveRule_3(RBTNode *removable) {
+    RBTNode *brother = GetBrother(removable);
+
+    if ((removable->parent_->color_ == BLACK)
+                && (brother->color_ == BLACK)
+                && (brother->l_child_->color_ == BLACK)
+                && (brother->r_child_->color_ == BLACK)) {
+        brother->color_ = RED;
+        RemoveRule_1(removable->parent_);
+    } else{
+        RemoveRule_4(removable);
+    }
+}
+void RBTree::RemoveRule_4(RBTNode *removable) {
+    RBTNode *brother = GetBrother(removable);
+
+    if ((removable->parent_->color_ == RED)
+            && (brother->color_ == BLACK)
+            && (brother->l_child_->color_ == BLACK)
+            && (brother->r_child_->color_ == BLACK)) {
+        brother->color_ = RED;
+        removable->parent_->color_ = BLACK;
+    } else{
+        RemoveRule_5(removable);
+    }
+}
+void RBTree::RemoveRule_5(RBTNode *removable) {
+    RBTNode *brother = GetBrother(removable);
+
+    if  (brother->color_ == BLACK) {
+        if ((removable == removable->parent_->l_child_) &&
+            (brother->r_child_->color_ == BLACK) &&
+            (brother->l_child_->color_ == RED)) { /* this last test is trivial too due to cases 2-4. */
+            brother->color_ = RED;
+            brother->l_child_->color_ = BLACK;
+            RotateToRight(brother);
+        } else if ((removable == removable->parent_->r_child_)
+                   && (brother->l_child_->color_ == BLACK)
+                   && (brother->r_child_->color_ == RED)) {
+            brother->color_ = RED;
+            brother->r_child_->color_ = BLACK;
+            RotateToLeft(brother);
+        }
+    }
+    RemoveRule_6(removable);
+}
+void RBTree::RemoveRule_6(RBTNode *removable) {
+    RBTNode *brother = GetBrother(removable);
+
+    brother->color_ = removable->parent_->color_;
+    removable->parent_->color_ = BLACK;
+
+    if (removable == removable->parent_->l_child_) {
+        brother->r_child_->color_ = BLACK;
+        RotateToLeft(removable->parent_);
+    } else {
+        brother->l_child_->color_ = BLACK;
+        RotateToRight(removable->parent_);
+    }
 }
